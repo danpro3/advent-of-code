@@ -8,13 +8,12 @@ stones = filestr.split(' ')
 print(stones)
 # _=[print(x) for x in grid]
 # %%
-stones = filestr.split(' ')
-N_BLINKS = 26
-blinks = [x for x in range(1,N_BLINKS+1)]
-nstones = []
-for i in range(N_BLINKS):
-    s = 0
+def blink():
+    s = 0        
     while s < len(stones):
+        # if stones[s] in cache:
+
+
         if stones[s] == '0':
             stones[s] = '1'
             s += 1
@@ -27,6 +26,14 @@ for i in range(N_BLINKS):
         else:
             stones[s] = str(int(stones[s])*2024)
             s += 1
+
+stones = filestr.split(' ')
+N_BLINKS = 26
+blinks = [x for x in range(1,N_BLINKS+1)]
+nstones = []
+cache = {}
+for i in range(N_BLINKS):
+    blink()
     # print(f'stones: {stones}')
     nstones.append(len(stones))
     print(f'Blink number: {i+1} Num stones = {len(stones)}')
