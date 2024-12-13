@@ -1,9 +1,9 @@
 # %% load input
 # import re
-# grid = 'AAAA\nBBCD\nBBCC\nEEEC'
-# grid = grid.split('\n')
+grid = 'AAAA\nBBCD\nBBCC\nEEEC'
+grid = grid.split('\n')
 # grid = open('inputs/input_11_test.txt','r').read().splitlines()
-grid = open('inputs/input_11.txt','r').read().splitlines()
+# grid = open('inputs/input_11.txt','r').read().splitlines()
 # _=[print(x) for x in grid]
 # print(grid)
 rows = len(grid)
@@ -55,8 +55,31 @@ print(f'price = {price}')
 
 
 # %%
-print(cache)
-len(cache)
-print(grid)
-print(regions)
-[print(f' {R}  {regions[R]}') for R in regions]
+
+def get_sides(R):
+    # find the range of the region
+    cells = set()
+    allr = []; allc = []
+    for info in regions[R]:
+        cells.add(info[0:2])
+        allr.append(info[0])
+        allc.append(info[1])
+    rows = (min(allr),max(allr))
+    cols = (min(allc),max(allc))
+    print(f'R: {R}, cells = {cells}, rows = {rows}, cols = {cols}')
+
+    # scan the region, append a sides score for each cell in the rectangle
+    for r in range(rows[1],rows[2]+1):
+        for c in range(cols[1],cols[2]+1):
+            1
+
+
+
+
+    return 0#sides
+
+_=[print(f' {R}  {regions[R]}') for R in regions]
+
+for R in regions:
+    sides = get_sides(R)
+    
