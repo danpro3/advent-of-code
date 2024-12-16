@@ -71,18 +71,38 @@ def move_robot(grid, robot, dir):
             grid[R][C] = '.'
             robot = [R,C+dc]
     if dc == 0:
-        cols_to_check = []
-        still_checking = True
-        while still_checking
+        movers = set()
+        movers.add((R,C))
+        frontier = set()
+        tocheck = set()
+        tocheck.add((R+dr,C))
+        while tocheck:
+            r,c = tocheck.pop()
+            if grid[r][c] in ['[', ']', '.']:
+                if grid[r][c] == '[':
+                    movers.append((r,c))
+                    movers.append((r,c+1))
+                    tocheck.add((r+dr,c))
+                    tocheck.add((r+dr,c+1))
+                if grid[r][c] == ']':
+                    movers.append((r,c))
+                    movers.append((r,c+1))
+                    tocheck.add((r+dr,c))
+                    tocheck.add((r+dr,c+1))
+                if grid[r][c] == '.':
+                    frontier.add((r,c))
 
 
-        while grid[R+dr*n][C] == ['[',']']:
-            n += 1
-        if grid[R+dr*n][C] == '.':
-            for i in range(n,0,-1):
-                grid[R+dr*i][C] = grid[R+dr*(i-1)][C]
-            grid[R][C] = '.'
-            robot = [R+dr,C]
+        print(f'movers = {movers}')
+        
+
+        # while grid[R+dr*n][C] == ['[',']']:
+        #     n += 1
+        # if grid[R+dr*n][C] == '.':
+        #     for i in range(n,0,-1):
+        #         grid[R+dr*i][C] = grid[R+dr*(i-1)][C]
+            # grid[R][C] = '.'
+            # robot = [R+dr,C]
     return robot
 
 def expand_warehouse(grid):
@@ -94,7 +114,7 @@ def expand_warehouse(grid):
             grid[r][c] = grid[r][c].replace('@','@.')
         temp = [list(x) for x in ''.join(grid[r])]
         grid[r] = [''.join(x) for x in temp]
-    show_grid(grid)
+    # show_grid(grid)
     return grid
 
 # main
@@ -102,19 +122,21 @@ grid = filestr[0].splitlines()
 grid = [list(x) for x in grid]
 rows, cols = len(grid), len(grid[0])
 instr = ''.join(filestr[1].splitlines())
-# show_grid(grid)
 # print(instr)
 grid = expand_warehouse(grid)
-
-idx = filestr[0].find('@')
-robot = [idx // (cols+1), idx % (cols+1)]
+newfilestr = [''.join(x) for x in grid]
+newfilestr = ''.join(newfilestr)
+idx = newfilestr.find('@')
+rows, cols = len(grid), len(grid[0])
+robot = [idx // cols, idx % cols]
 # print(robot, grid[robot[0]][robot[1]])
 dirs = {'^':(-1,0), '>':(0,1), 'v':(1,0), '<':(0,-1)}
 
-for dir in instr:#[0:10]:
-    # print(f'robot: {robot}, dir: {dir}')
-    robot = move_robot(grid,robot,dir)
 show_grid(grid)
+for dir in instr[0:2]:
+    print(f'robot: {robot}, dir: {dir}')
+    robot = move_robot(grid,robot,dir)
+    show_grid(grid)
 print(f'robot = {robot}')
 
 GPS = 0
