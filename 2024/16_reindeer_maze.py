@@ -1,4 +1,4 @@
-# %%
+# %% read file
 filestr = open('inputs/input_16_test.txt','r').read()
 # filestr = open('inputs/input_16_test2.txt','r').read()
 # filestr = open('inputs/input_16.txt','r').read()
@@ -11,6 +11,7 @@ idx = filestr.index('E')
 E = [idx//(cols+1), idx % (cols+1)]
 print(f'start = {S}, end = {E}')
 _=[print(x) for x in grid]
+
 # %% Part 1
 from heapq import heapify, heappush, heappop
 
@@ -74,19 +75,19 @@ while(todo):
 
 print(f'best score = {score}')
 
-# %%
+# %% part 2
 
 def move2(todo):
     score , r, c, dir, steps, tiles = heappop(todo)
-    if (r, c, dir) in visited or steps > 60:
-        return tiles, score, todo
+    if (r, c, tiles) in visited or score < 12000:
+        return todo
     else:
-        visited.add((r,c,dir))
+        visited.add((r,c,tiles))
     # print(f'grid [{r}][{c}] = {grid[r][c]}')
     if grid[r][c] == 'E':
         print(f'Done. r,c = {r,c}, score = {score}, steps = {steps}, tiles = {len(tiles)}')
         # todo = []
-        return tiles, score, todo
+        return todo
     mylist = list(tiles)
     if dir == 'U':
         if grid[r-1][c] in ['.','E']:
@@ -140,7 +141,7 @@ def move2(todo):
         if grid[r][c-1] in ['.','E']:
             mylist.append((r,c-1))
             heappush(todo, (score+1+0000, r, c-1, 'L', steps + 1, tuple(mylist)))
-    return tiles, score, todo
+    return todo
 
 todo = []
 visited = set()
@@ -151,17 +152,13 @@ heappush(todo,(0, S[0], S[1],'R', 0, tiles))
 print(todo)
 
 while(todo):
-    if grid[todo[0][1]][todo[0][2]] == 'E':
+    if grid[todo[0][1]][todo[0][2]] == 'E': # is that tile the End?
         print(f'todo[0] = {todo}')
-    # if goodseats == []:
-    #     goodseats = todo[0][4]
-    # else:
-    #     goodseats = goodseats.union(todo[0][4])
-    tiles, score, todo = move2(todo)
-    # print(f'score = {score}, length todo = {len(todo)}')
+        goodseats.add(todo[0][5])
+    todo = move2(todo)
 
 # have to add one for starttiles
-# print(f'best score = {score}, tiles = {len(tiles)+1}') 
-# print(f'number of good seats = {len(goodseats)}')
+# print(f'best score = {score}, tiles = {len(tiles)}') 
+print(f'number of good seats = {len(goodseats)}')
 # %%
 tiles
