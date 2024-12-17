@@ -1,6 +1,6 @@
 # %%
-# filestr = open('inputs/input_16_test.txt','r').read()
-filestr = open('inputs/input_16_test2.txt','r').read()
+filestr = open('inputs/input_16_test.txt','r').read()
+# filestr = open('inputs/input_16_test2.txt','r').read()
 # filestr = open('inputs/input_16.txt','r').read()
 grid = filestr.splitlines()
 rows = len(grid)
@@ -77,89 +77,91 @@ print(f'best score = {score}')
 # %%
 
 def move2(todo):
-    score , r, c, dir, tiles = heappop(todo)
-    if (r, c, dir) in visited:
+    score , r, c, dir, steps, tiles = heappop(todo)
+    if (r, c, dir) in visited or steps > 60:
         return tiles, score, todo
     else:
         visited.add((r,c,dir))
     # print(f'grid [{r}][{c}] = {grid[r][c]}')
     if grid[r][c] == 'E':
-        print(f'Done. r,c = {r,c}, score = {score}, tiles = {len(tiles)}')
-        todo = []
+        print(f'Done. r,c = {r,c}, score = {score}, steps = {steps}, tiles = {len(tiles)}')
+        # todo = []
         return tiles, score, todo
     mylist = list(tiles)
     if dir == 'U':
         if grid[r-1][c] in ['.','E']:
             mylist.append((r-1,c))
-            heappush(todo, (score+1+0000, r-1, c, 'U',tuple(mylist)))
+            heappush(todo, (score+1+0000, r-1, c, 'U', steps + 1, tuple(mylist)))
         if grid[r][c+1] in ['.','E']:
             mylist.append((r,c+1))
-            heappush(todo, (score+1+1000, r, c+1, 'R',tuple(mylist)))
-        if grid[r+1][c] in ['.','E']:
-            mylist.append((r+1,c))
-            heappush(todo, (score+1+2000, r+1, c, 'D',tuple(mylist)))
+            heappush(todo, (score+1+1000, r, c+1, 'R', steps + 1, tuple(mylist)))
+        # if grid[r+1][c] in ['.','E']:
+        #     mylist.append((r+1,c))
+        #     heappush(todo, (score+1+2000, r+1, c, 'D',tuple(mylist)))
         if grid[r][c-1] in ['.','E']:
             mylist.append((r,c-1))
-            heappush(todo, (score+1+1000, r, c-1, 'L',tuple(mylist)))
+            heappush(todo, (score+1+1000, r, c-1, 'L', steps + 1, tuple(mylist)))
     if dir == 'R':
         if grid[r-1][c] in ['.','E']:
             mylist.append((r-1,c))
-            heappush(todo, (score+1+1000, r-1, c, 'U',tuple(mylist)))
+            heappush(todo, (score+1+1000, r-1, c, 'U', steps + 1, tuple(mylist)))
         if grid[r][c+1] in ['.','E']:
             mylist.append((r,c+1))
-            heappush(todo, (score+1+0000, r, c+1, 'R',tuple(mylist)))
+            heappush(todo, (score+1+0000, r, c+1, 'R', steps + 1, tuple(mylist)))
         if grid[r+1][c] in ['.','E']:
             mylist.append((r+1,c))
-            heappush(todo, (score+1+1000, r+1, c, 'D',tuple(mylist)))
-        if grid[r][c-1] in ['.','E']:
-            mylist.append((r,c-1))
-            heappush(todo, (score+1+2000, r, c-1, 'L',tuple(mylist)))
+            heappush(todo, (score+1+1000, r+1, c, 'D', steps + 1, tuple(mylist)))
+        # if grid[r][c-1] in ['.','E']:
+        #     mylist.append((r,c-1))
+        #     heappush(todo, (score+1+2000, r, c-1, 'L',tuple(mylist)))
     if dir == 'D':
-        if grid[r-1][c] in ['.','E']:
-            mylist.append((r-1,c))
-            heappush(todo, (score+1+2000, r-1, c, 'U',tuple(mylist)))
+        # if grid[r-1][c] in ['.','E']:
+        #     mylist.append((r-1,c))
+        #     heappush(todo, (score+1+2000, r-1, c, 'U',tuple(mylist)))
         if grid[r][c+1] in ['.','E']:
             mylist.append((r,c+1))
-            heappush(todo, (score+1+1000, r, c+1, 'R',tuple(mylist)))
+            heappush(todo, (score+1+1000, r, c+1, 'R', steps + 1, tuple(mylist)))
         if grid[r+1][c] in ['.','E']:
             mylist.append((r+1,c))
-            heappush(todo, (score+1+0000, r+1, c, 'D',tuple(mylist)))
+            heappush(todo, (score+1+0000, r+1, c, 'D', steps + 1, tuple(mylist)))
         if grid[r][c-1] in ['.','E']:
             mylist.append((r,c-1))
-            heappush(todo, (score+1+1000, r, c-1, 'L',tuple(mylist)))
+            heappush(todo, (score+1+1000, r, c-1, 'L', steps + 1, tuple(mylist)))
     if dir == 'L':
         if grid[r-1][c] in ['.','E']:
             mylist.append((r-1,c))
-            heappush(todo, (score+1+1000, r-1, c, 'U',tuple(mylist)))
-        if grid[r][c+1] in ['.','E']:
-            mylist.append((r,c+1))
-            heappush(todo, (score+1+2000, r, c+1, 'R',tuple(mylist)))
+            heappush(todo, (score+1+1000, r-1, c, 'U', steps + 1, tuple(mylist)))
+        # if grid[r][c+1] in ['.','E']:
+        #     mylist.append((r,c+1))
+        #     heappush(todo, (score+1+2000, r, c+1, 'R',tuple(mylist)))
         if grid[r+1][c] in ['.','E']:
             mylist.append((r+1,c))
-            heappush(todo, (score+1+1000, r+1, c, 'D',tuple(mylist)))
+            heappush(todo, (score+1+1000, r+1, c, 'D', steps + 1, tuple(mylist)))
         if grid[r][c-1] in ['.','E']:
             mylist.append((r,c-1))
-            heappush(todo, (score+1+0000, r, c-1, 'L',tuple(mylist)))
+            heappush(todo, (score+1+0000, r, c-1, 'L', steps + 1, tuple(mylist)))
     return tiles, score, todo
 
 todo = []
 visited = set()
 goodseats = set()
-
+tiles = tuple([S])
 # best_score = 7036
-heappush(todo,(0, S[0], S[1],'R', ()))
+heappush(todo,(0, S[0], S[1],'R', 0, tiles))
 print(todo)
 
 while(todo):
     if grid[todo[0][1]][todo[0][2]] == 'E':
-        print(f'length of tiles = {len(tiles)}')
-    if goodseats == []:
-        goodseats = todo[0][4]
-    else:
-        goodseats = goodseats.union(todo[0][4])
+        print(f'todo[0] = {todo}')
+    # if goodseats == []:
+    #     goodseats = todo[0][4]
+    # else:
+    #     goodseats = goodseats.union(todo[0][4])
     tiles, score, todo = move2(todo)
     # print(f'score = {score}, length todo = {len(todo)}')
 
 # have to add one for starttiles
-print(f'best score = {score}, tiles = {len(tiles)+1}') 
-print(f'number of good seats = {len(goodseats)}')
+# print(f'best score = {score}, tiles = {len(tiles)+1}') 
+# print(f'number of good seats = {len(goodseats)}')
+# %%
+tiles
