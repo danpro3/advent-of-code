@@ -1,6 +1,6 @@
 # %%
-filestr = open('inputs/input_15_test.txt','r').read().split('\n\n')
-# filestr = open('inputs/input_15.txt','r').read().split('\n\n')
+# filestr = open('inputs/input_15_test.txt','r').read().split('\n\n')
+filestr = open('inputs/input_15.txt','r').read().split('\n\n')
 
 # %% part 1
 
@@ -43,7 +43,7 @@ robot = [idx // (cols+1), idx % (cols+1)]
 # print(robot, grid[robot[0]][robot[1]])
 dirs = {'^':(-1,0), '>':(0,1), 'v':(1,0), '<':(0,-1)}
 
-for dir in instr:#[0:10]:
+for dir in instr:
     # print(f'robot: {robot}, dir: {dir}')
     robot = move_robot(grid,robot,dir)
 show_grid(grid)
@@ -71,39 +71,36 @@ def move_robot(grid, robot, dir):
             grid[R][C] = '.'
             robot = [R,C+dc]
     if dc == 0:
-        movers = set()
-        movers.add((R,C))
-        frontier = set()
-        tocheck = set()
-        tocheck.add((R+dr,C))
-        while tocheck:
-            r,c = tocheck.pop()
-            if grid[r][c] in ['[', ']', '.']:
-                if grid[r][c] == '[':
-                    movers.append((r,c))
-                    movers.append((r,c+1))
-                    tocheck.add((r+dr,c))
-                    tocheck.add((r+dr,c+1))
-                if grid[r][c] == ']':
-                    movers.append((r,c))
-                    movers.append((r,c+1))
-                    tocheck.add((r+dr,c))
-                    tocheck.add((r+dr,c+1))
-                if grid[r][c] == '.':
-                    frontier.add((r,c))
-
-
-        print(f'movers = {movers}')
-        
-
-        # while grid[R+dr*n][C] == ['[',']']:
-        #     n += 1
-        # if grid[R+dr*n][C] == '.':
-        #     for i in range(n,0,-1):
-        #         grid[R+dr*i][C] = grid[R+dr*(i-1)][C]
-            # grid[R][C] = '.'
-            # robot = [R+dr,C]
+        flags = []
+        movers = [(R,C,'@')]
+        flags = checkit(movers,flags,R,C,dr)
+        if all(flags):
+            # now lets move
+            for r,c,V in movers:
+                grid[r][c] = '.'
+            for r,c,V in movers:
+                grid[r+dr][c] = V
+            robot = [R+dr,C]
     return robot
+
+def checkit(movers,flags,r,c,dr):
+    if grid[r+dr][c] == '#':
+        flags.append(False)
+        return flags
+    if grid[r+dr][c] == '.':
+        flags.append(True)
+        return flags
+    if grid[r+dr][c] == '[':
+        movers.append((r+dr, c, grid[r+dr][c]))
+        flags = checkit(movers, flags, r+dr, c, dr)
+        movers.append((r+dr,c+1, grid[r+dr][c+1]))
+        flags = checkit(movers, flags, r+dr, c+1, dr)
+    if grid[r+dr][c] == ']':
+        movers.append((r+dr, c-1, grid[r+dr][c-1]))
+        flags = checkit(movers, flags, r+dr, c-1, dr)
+        movers.append((r+dr, c, grid[r+dr][c]))
+        flags = checkit(movers, flags, r+dr, c, dr)
+    return flags
 
 def expand_warehouse(grid):
     for r in range(rows):
@@ -132,11 +129,12 @@ robot = [idx // cols, idx % cols]
 # print(robot, grid[robot[0]][robot[1]])
 dirs = {'^':(-1,0), '>':(0,1), 'v':(1,0), '<':(0,-1)}
 
-show_grid(grid)
-for dir in instr[0:2]:
-    print(f'robot: {robot}, dir: {dir}')
+# show_grid(grid)
+for dir in instr:
+# for dir in ['<','^']:
+    # print(f'robot: {robot}, dir: {dir}')
     robot = move_robot(grid,robot,dir)
-    show_grid(grid)
+# show_grid(grid)
 print(f'robot = {robot}')
 
 GPS = 0
@@ -145,3 +143,24 @@ for r in range(rows):
         if grid[r][c] == '[':
             GPS += 100*r + c
 print(f'GPS = {GPS}')
+# %%
+#  movers = set()
+#         movers.add((R,C))
+#         frontier = set()
+#         tocheck = set()
+#         tocheck.add((R+dr,C))
+#         while tocheck:
+#             r,c = tocheck.pop()
+#             if grid[r][c] in ['[', ']', '.']:
+#                 if grid[r][c] == '[':
+#                     movers.append((r,c))
+#                     movers.append((r,c+1))
+#                     tocheck.add((r+dr,c))
+#                     tocheck.add((r+dr,c+1))
+#                 if grid[r][c] == ']':
+#                     movers.append((r,c))
+#                     movers.append((r,c+1))
+#                     tocheck.add((r+dr,c))
+#                     tocheck.add((r+dr,c+1))
+#                 if grid[r][c] == '.':
+#                     frontier.add((r,c))
