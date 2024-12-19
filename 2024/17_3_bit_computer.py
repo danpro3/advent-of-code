@@ -86,7 +86,7 @@ full_output_str = [str(x) for x in full_output]
 full_output = ','.join(full_output_str)
 # print(f'as a string, output = {full_output}')
 
-# %% part 2
+# %% part 2 -----------------------------------------------------------------------------------
 
 # need to work backwards: find the number that builds the program 
 # from the ending up to the beginning
@@ -104,18 +104,6 @@ def run_program(regs, prog):
         else:
             a = Q
     return full_output
-
-# A = 729; B = 0; C = 0; prog = [0,1,5,4,3,0]
-# A = 117440; B = 0; C = 0; prog = [0,3,5,4,3,0] # part 2 makes copy of itself using A=117440
-# A = 0o345300
-# A = 0o35000
-
-# real input:
-A = 59397658; B = 0; C = 0; prog = [2,4,1,1,7,5,4,6,1,4,0,3,5,5,3,0]
-regs = [A, B, C]
-# A = 0o2
-# output = run_program(regs, prog)
-# print(f'{oct(A)} -> {output}')
 
 def find_one_digit(todo):
     workingA, digit = todo.pop()
@@ -137,19 +125,35 @@ def find_one_digit(todo):
         k += 1
     return todo
 
+# main --------------
+# A = 729; B = 0; C = 0; prog = [0,1,5,4,3,0]
+# A = 117440; B = 0; C = 0; prog = [0,3,5,4,3,0] # part 2 makes copy of itself using A=117440
+# A = 0o345300
+# A = 0o35000
+
+# real input:
+A = 59397658; B = 0; C = 0; prog = [2,4,1,1,7,5,4,6,1,4,0,3,5,5,3,0]
+regs = [A, B, C]
+# A = 0o2
+# initial check
+output = run_program(regs, prog)
+print(f'{oct(A)} -> {output}')
+print()
+
 print(f'{prog}')
-done = False
 N = len(prog)
-workingA = 0
 todo = [(0,N)]
 winners = []
+del regs
 while todo:
     A, digit = todo[0]
     todo = find_one_digit(todo)
 # print(f'digit = {digit}, A = {oct(A)}, A = {A}')
 
+# final check
 regs = [A, B, C]
 output = run_program(regs, prog)
+print()
 print(f'program: {prog}')
 print(f'output:  {output}')
 # TO LOW: digit = 3, A = 0o5600644674024000, A = 202366627358720
