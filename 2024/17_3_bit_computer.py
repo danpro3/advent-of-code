@@ -1,5 +1,5 @@
 # %%
-def combo(input):
+def combo(regs, input):
     if input in [0,1,2,3]:
         return input
     else:
@@ -7,15 +7,16 @@ def combo(input):
 
 def run_instruction(regs, opcode,input,i):
     if opcode == 0: # adv
-        regs[0] = regs[0]//2**combo(input)
+        regs[0] = regs[0]//2**combo(regs, input)
         return i+2
 
     if opcode == 1: # bxl
-        regs[1] = regs[1] ^ input
+        # print(regs, input)
+        regs[1] = round(regs[1]) ^ input
         return i+2
 
     if opcode == 2: # bst
-        regs[1] = combo(input) % 8
+        regs[1] = combo(regs, input) % 8
         return i+2
 
     if opcode == 3: # jnz
@@ -25,18 +26,18 @@ def run_instruction(regs, opcode,input,i):
             return input
         
     if opcode == 4: # bxc
-        regs[1] = regs[1] ^ regs[2]
+        regs[1] = int(regs[1]) ^ int(regs[2])
         return i+2
 
     if opcode == 5: # out
-        return [i+2, combo(input) % 8]
+        return [i+2, combo(regs, input) % 8]
 
     if opcode == 6: # bdv 
-        regs[1] = regs[0]//2**combo(input)
+        regs[1] = regs[0]//2**combo(regs, input)
         return i+2
 
     if opcode == 7: # cdv
-        regs[2] = regs[0]//2**combo(input)
+        regs[2] = regs[0]//2**combo(regs, input)
         return i+2
 
 # main
@@ -106,9 +107,11 @@ def run_program(regs, prog):
     return full_output
 
 def find_one_digit(todo):
-    workingA, digit = todo.pop()
-    if digit < 0:
-        print(f'totally done: {workingA}')
+    workingA, digit = todo.pop(0)
+    if digit < 1:
+        winners.append(workingA)
+        print(f'Winner: {workingA}, digit: {digit}')
+        return todo
     k = 0
     while k < 8:
         A = workingA + k*8**(digit-1)
@@ -116,20 +119,14 @@ def find_one_digit(todo):
         output = run_program(regs, prog)
         sublist = output[digit-N-1:]
         needlist = prog[digit-N-1:]
-        print(f'{oct(A)} -> {output}, {sublist}, need: {needlist}')
+        # print(f'{oct(int(A))} -> {output}, {sublist}, need: {needlist}')
         if sublist == needlist:
-            workingA = A
-            digit -= 1
-            todo.append((A,digit))
-            print(f'got it: so far: A = {oct(A)}')
+            todo.append((A,digit-1))
+            # print(f'got it: so far: A = {oct(int(A))}')
         k += 1
     return todo
 
 # main --------------
-# A = 729; B = 0; C = 0; prog = [0,1,5,4,3,0]
-# A = 117440; B = 0; C = 0; prog = [0,3,5,4,3,0] # part 2 makes copy of itself using A=117440
-# A = 0o345300
-# A = 0o35000
 
 # real input:
 A = 59397658; B = 0; C = 0; prog = [2,4,1,1,7,5,4,6,1,4,0,3,5,5,3,0]
@@ -144,56 +141,21 @@ print(f'{prog}')
 N = len(prog)
 todo = [(0,N)]
 winners = []
-del regs
+regs = []
 while todo:
+    # print(todo)
     A, digit = todo[0]
     todo = find_one_digit(todo)
 # print(f'digit = {digit}, A = {oct(A)}, A = {A}')
+print(f'{len(winners)} winners = {winners}')
+print(f'lowest winner = {min(winners)}')
 
 # final check
+A = min(winners)
 regs = [A, B, C]
 output = run_program(regs, prog)
 print()
-print(f'program: {prog}')
-print(f'output:  {output}')
-# TO LOW: digit = 3, A = 0o5600644674024000, A = 202366627358720
-
-# %%
-A = 59397658; B = 0; C = 0; prog = [2,4,1,1,7,5,4,6,1,4,0,3,5,5,3,0]
-A = 0o0
-regs = [A, B, C]
-output = run_program(regs, prog)
 print(f'A = {A} = {oct(A)} -> {output}')
-
-
-# %%
-print(f'{prog}')
-done = False
-N = len(prog)
-digit = N
-workingA = 0
-todo = []
-winners = []
-while digit > 2 and not done:
-    found = False
-    i = 0
-    while i < 8 and not found:
-        A = workingA + i*8**(digit-1)
-        regs = [A, B, C]
-        output = run_program(regs, prog)
-        sublist = output[digit-N-1:]
-        needlist = prog[digit-N-1:]
-        print(f'{oct(A)} -> {output}, {sublist}, need: {needlist}')
-        if sublist == needlist:
-            found = True
-            workingA = A
-            digit -= 1
-            print(f'got it: so far: A = {oct(A)}')
-        i += 1
-print(f'digit = {digit}, A = {oct(A)}, A = {A}')
-
-regs = [A, B, C]
-output = run_program(regs, prog)
 print(f'program: {prog}')
 print(f'output:  {output}')
 # TO LOW: digit = 3, A = 0o5600644674024000, A = 202366627358720
