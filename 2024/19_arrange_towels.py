@@ -10,7 +10,7 @@ for i,towel in enumerate(towels):
 print(towels)
 print(designs)
 
-# %% part 1
+# %% part 1 and 2
 # @functools.lru_cache
 def check_design(design):
     if design in cache:
@@ -38,5 +38,5 @@ for i,design in enumerate(designs):
     if num_ways > 0:
         total_designs += 1
         total_ways += num_ways
-    print(f'design: {i+1} of {len(designs)}, {design}, total so far = {total_designs}, , total ways so far = {total_ways}')
+    # print(f'design: {i+1} of {len(designs)}, {design}, total so far = {total_designs}, , total ways so far = {total_ways}')
 print(f'total designs = {total_designs}, total ways = {total_ways}')
