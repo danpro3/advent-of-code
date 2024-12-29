@@ -150,7 +150,6 @@ for i,xbit in enumerate(xlist):
         if OR_carryover not in gate2:
             print(f'we have a new problem: OR_carryover = {OR_carryover}')
             print(f'xbit: {xbit}, gate2: {gate2}, {found}')
-            # break
 
         gate3, found = find_gate(gate2[4],'OR')
         # print(f'xbit: {xbit}, gate3: {gate3}, {found}')
