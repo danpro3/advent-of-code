@@ -57,7 +57,7 @@ print(all_paths)
 # %% move on the dpad given some code
 
 def move_dpad(todo):
-    steps, (r, c), code, path = heappop(todo)
+    steps, (r, c), code, path, As = heappop(todo)
     if (r,c,path) in visited:
         return todo
     else:
@@ -66,11 +66,13 @@ def move_dpad(todo):
     if (r,c) == dpad[code[0]]:
         just_hit = code[0]
         path += 'A'
+        As += 1
         # print(f'found: code[0], rest: {code}, {path}')
         if len(code) > 1:
             code = code[1:]
             while code[0] == just_hit and len(code) > 0:
                 path += 'A'
+                As += 1
                 code = code[1:]
             if len(all_paths) > 0 and len(path) > len(next(iter(all_paths))):
                 return []
@@ -79,12 +81,12 @@ def move_dpad(todo):
                 return []
             else:
                 all_paths.add(path)
-                return []  # return [] for just 1 path
+                return todo  # return [] for just 1 path
     for dir in dirs:
         dr, dc = dir
         if (r+dr,c+dc) in dpad.values() and (r+dr,c+dc,path) not in visited:
             # print(f'pushing: {steps + 1, (r+dr,c+dc), (R,C), path+dirs[(dr,dc)]}')
-            heappush(todo, (steps + 1, (r+dr,c+dc), code, path+dirs[(dr,dc)]))
+            heappush(todo, (steps + 1, (r+dr,c+dc), code, path+dirs[(dr,dc)], As))
     return todo
 
 # main ---------------
@@ -94,15 +96,21 @@ codes = {'<A^A^^>AvvvA', '<A^A^>^AvvvA', '<A^A>^^AvvvA'}
 while len(codes) > 0:
     code = codes.pop()
     visited = set()
-    todo = [(0, dpad[START], code, '')]
+    todo = [(0, dpad[START], code, '', 0)]
     while todo:
         # print(todo)
         todo = move_dpad(todo)
-    print(all_paths)
+print(all_paths)
 print(f'length of all_paths: {len(all_paths)}')
-print(f'length of shortest path: {len(next(iter(all_paths)))}')
-
-
+it = iter(all_paths)
+print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
 
 
 # %%
+how many presses are needed to hit the sequence
+with a further depth of robots, if 
+cache[sequence at depth] = min number
+
+use the lr cache
+
+recursion down. start at numpad
