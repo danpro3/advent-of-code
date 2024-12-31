@@ -150,3 +150,20 @@ print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
 
 # recursion down. start at numpad
 
+import functools
+@functools.lru_cache
+
+def run_robot(level, sequences):
+    if level == 1: # end condition: number of robots
+        return len(sequences[0])
+    else:
+        sequences = paths_for_dpad(sequences)
+        return run_robot(level+1, list(sequences))
+
+code = '029A'
+npad_paths =  paths_for_npad(code)
+print(npad_paths)
+npresses = run_robot(0, npad_paths)
+complexity = npresses * int(code[:-1])
+
+
