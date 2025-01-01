@@ -2,6 +2,7 @@
 
 # filestr = open('inputs/input_24_test.txt','r').read().split('\n\n')
 filestr = open('inputs/input_24.txt','r').read().split('\n\n')
+# filestr = open('inputs/input_24_noah.txt','r').read().split('\n\n')
 # filestr = open('inputs/input_24_swaps.txt','r').read().split('\n\n')
 wirestrings = filestr[0].splitlines()
 gates = filestr[1].splitlines()
@@ -69,12 +70,18 @@ def swap_wires(gates, A, B):
     print(f'gates are swapped: {A, B}')
     return gates
 
+baddies2 = []
 gates = swap_wires(gates, 'bjm', 'z07')
 gates = swap_wires(gates, 'hsw', 'z13')
 gates = swap_wires(gates, 'skf', 'z18')
 gates = swap_wires(gates, 'nvr', 'wkr')
-
 baddies2 = {'z07', 'bjm','hsw', 'z13','skf','z18','nvr','wkr'}
+
+# noah input
+# gates = swap_wires(gates, 'vdc', 'z12')
+# gates = swap_wires(gates, 'nhn', 'z21')
+# gates = swap_wires(gates, 'khg', 'tvb')
+# gates = swap_wires(gates, 'gst', 'z33')
 
 print(baddies2)
 password = ','.join(sorted(baddies2))
@@ -190,4 +197,5 @@ for i,xbit in enumerate(xlist):
             # break
 
 print(f'{xbit}, {len(baddies)} baddies: {sorted(baddies)}')
+
 

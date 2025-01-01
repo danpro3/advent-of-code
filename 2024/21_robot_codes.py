@@ -1,5 +1,6 @@
 # %% part 1
 from heapq import heapify, heappop, heappush
+from functools import lru_cache
 lines = open('inputs/input_21_test.txt','r').read().splitlines()
 # filestr = open('inputs/input_21.txt','r').read().splitlines()
 print(lines)
@@ -56,6 +57,11 @@ code = '029A'
 npad_paths =  paths_for_npad(code)
 print(npad_paths)
 
+# %%
+# create quick dictionary for quickest ways to move on the dpad
+
+
+
 
 # %% move on the dpad given some sequences
 
@@ -63,10 +69,10 @@ def move_dpad(todo, dpad_paths, visited):
     steps, (r, c), seq, path, As = heappop(todo)
     if len(dpad_paths) > 0 and steps > len(next(iter(dpad_paths))):
         return todo
-    if (r,c,path) in visited:
+    if path in visited:
         return todo
     else:
-        visited.add((r, c, path))
+        visited.add(path)
     # print(seq)
     if (r,c) == dpad[seq[0]]:
         just_hit = seq[0]
@@ -94,28 +100,31 @@ def move_dpad(todo, dpad_paths, visited):
             heappush(todo, (steps + 1, (r+dr,c+dc), seq, path+dirs[(dr,dc)], As))
     return todo
 
-# main ---------------
 
-def paths_for_dpad(sequences):
+@lru_cache
+def paths_for_dpad(seq):
+    print(seq)
     dpad_paths = set()
-    # todo = []
-    # heappush(todo,(0, dpad['A'], sequences, ''))
-    while len(sequences) > 0:
-        visited = set()
-        seq = sequences.pop()
-        todo = [(0, dpad['A'], seq, '', 0)]
-        while todo:
-            # print(todo)
-            todo = move_dpad(todo, dpad_paths, visited)
-        print(seq)
-        it = iter(dpad_paths)
-        print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
-        print(f'length of dpad_paths: {len(dpad_paths)}')
+    # while len(sequences) > 0:
+    # seq = sequences.pop()
+    todo = [(0, seq[0], seq, '', 0)]
+    print('working')
+    while todo:
+        # print(todo)
+        todo = move_dpad(todo, dpad_paths, visited)
+    # it = iter(dpad_paths)
+    # print(f'length of shortest path: {len(next(it))}')
+    # print(f'length of dpad_paths: {len(dpad_paths)}')
     return dpad_paths
 
-sequences = {'<A^A^^>AvvvA', '<A^A^>^AvvvA', '<A^A>^^AvvvA'}
-dpad_paths =  paths_for_dpad(sequences)
+# main ---------------
+visited = set()
+dpad_paths = set()
+sequences = ['<A^A^^>AvvvA', '<A^A^>^AvvvA', '<A^A>^^AvvvA']
+for sequence in sequences:
+    dpad_paths |= paths_for_dpad(sequence)
 print(dpad_paths)
+# [print(x) for x in dpad_paths]
 print(f'length of dpad_paths: {len(dpad_paths)}')
 it = iter(dpad_paths)
 print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
@@ -152,18 +161,94 @@ print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
 
 import functools
 @functools.lru_cache
-
-def run_robot(level, sequences):
-    if level == 1: # end condition: number of robots
-        return len(sequences[0])
+def run_robot(level, sequence):
+    if level == 2: # end condition: number of robots
+        # print(f'seq = {sequence}')
+        return len(sequence)
+    if sequence in cache:
+        return cache[sequence]
     else:
-        sequences = paths_for_dpad(sequences)
-        return run_robot(level+1, list(sequences))
+        
+        sequences = paths_for_dpad(sequence)
+        print(f'sequences = {sequences}')
+        npresses_list = []
+        for sequence in sequences:
+            npresses = 0
+            for i in range(len(sequence)-1):
+                npresses += run_robot(level+1, sequence[i:i+2])
+            npresses_list.append(npresses)
+            print(f'npresses = {npresses}')
 
+        # cache[sequence] = min(npresses_list)
+        # cache[sequence] = min(run_robot(level+1, seq) for seq in sequences)
+    # return cache[sequence]
+        return min(npresses_list)
+
+cache = dict()
 code = '029A'
 npad_paths =  paths_for_npad(code)
 print(npad_paths)
-npresses = run_robot(0, npad_paths)
+
+npresses_list = []
+for i in range(len(next(inter(npad_paths))-1):
+    for npad_path in npad_paths:
+    npresses = 0
+        npresses += run_robot(0, npad_path[i:i+2])
+    npresses_list.append(npresses)
+    print(f'npresses = {npresses}')
+
+print(f'min npresses = {min(npresses_list)}')
+
+print(f'npresses = {npresses}')
+print(f'dpad_paths = {dpad_paths}')
+print(f'length of dpad_paths: {len(dpad_paths)}')
+it = iter(dpad_paths)
+print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
+
 complexity = npresses * int(code[:-1])
+print(f'complexity = {complexity}')
+
+# example 029A: length paths = 12, 28, 68
+
+# %%
+print(dpad_paths)
+ex = 'v<<A>>^A<A>AvA<^AA>A<vAAA>^A'
+ex in dpad_paths
+print(cache['<A^A^^>AvvvA'])
 
 
+
+# def move_dpad(todo, dpad_paths, visited):
+#     steps, (r, c), seq, path, As = heappop(todo)
+#     if len(dpad_paths) > 0 and steps > len(next(iter(dpad_paths))):
+#         return todo
+#     if path in visited:
+#         return todo
+#     else:
+#         visited.add(path)
+#     # print(seq)
+#     if (r,c) == dpad[seq[0]]:
+#         just_hit = seq[0]
+#         path += 'A'
+#         As += 1
+#         # print(f'found: seq[0], rest: {seq}, {path}')
+#         if len(seq) > 1:
+#             seq = seq[1:]
+#             while seq[0] == just_hit and len(seq) > 0:
+#                 path += 'A'
+#                 As += 1
+#                 seq = seq[1:]
+#             if len(dpad_paths) > 0 and len(path) > len(next(iter(dpad_paths))):
+#                 return []
+#         else:
+#             if len(dpad_paths) > 0 and len(path) > len(next(iter(dpad_paths))):
+#                 return []
+#             else:
+#                 dpad_paths.add(path)
+#                 return todo  # return [] for just 1 path
+#     for dir in dirs:
+#         dr, dc = dir
+#         if (r+dr,c+dc) in dpad.values() and (r+dr,c+dc,path) not in visited:
+#             # print(f'pushing: {steps + 1, (r+dr,c+dc), (R,C), path+dirs[(dr,dc)]}')
+#             heappush(todo, (steps + 1, (r+dr,c+dc), seq, path+dirs[(dr,dc)], As))
+#     return todo
