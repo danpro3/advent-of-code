@@ -1,5 +1,7 @@
 # %% part 1
 from heapq import heapify, heappop, heappush
+from collections import defaultdict
+
 from functools import lru_cache
 lines = open('inputs/input_21_test.txt','r').read().splitlines()
 # filestr = open('inputs/input_21.txt','r').read().splitlines()
@@ -14,6 +16,86 @@ dpad = {'^':(0,1), 'A':(0,2), \
                '<':(1,0), 'v':(1,1), '>':(1,2)}
 
 dirs = {(-1,0):'^', (0,1):'>', (1,0):'v', (0,-1):'<'}
+
+# %%
+
+# @lru_cache
+def move_npad(todo, pair):
+    steps, (r, c), path = heappop(todo)
+    if (r,c) == npad[pair[1]]:
+        path += 'A'
+        if pair not in npad_dict:
+            print(f'Adding: {pair}, {path}')
+            npad_dict[pair] = [path]
+        else:
+            if len(path) > len(next(iter(npad_dict[pair]))):
+                return []
+            else:
+                print(f'Adding: {pair}, {path}')
+                npad_dict[pair].append(path)
+                return todo
+    for dir in dirs:
+        dr, dc = dir
+        if (r+dr,c+dc) in npad.values():
+            # print(f'pushing: {steps + 1, (r+dr,c+dc), (R,C), path+dirs[(dr,dc)]}')
+            heappush(todo, (steps + 1, (r+dr,c+dc), path+dirs[(dr,dc)]))
+    return todo
+
+code = 'A029A'
+visited = set()
+npad_paths = set()
+npad_dict = dict()
+steps = 0
+for i in range(len(code)-1):
+    pair = code[i:i+2]
+    todo = [(steps, npad[code[i]], '')]
+    while todo:
+        # print(todo)
+        todo = move_npad(todo, pair)
+
+# print(npad_paths)
+print(npad_dict)
+
+# %% build all paths of npad
+def concat(i, code, string, allpaths):
+    pair = code[i:i+2]
+    if i == len(code)-2:
+        if len(npad_dict[pair]) >= 1:
+            for k in range(len(npad_dict[pair])):
+                newstring = string + npad_dict[pair][k]
+                allpaths.append(newstring)
+    else:
+        if len(npad_dict[pair]) >= 1:
+            for k in range(len(npad_dict[pair])):
+                concat(i+1,code, string + npad_dict[pair][k],allpaths)
+    return allpaths
+
+code = 'A029A'
+print(f'code = {code}')
+allpaths = concat(0, code, '', [])
+print(f'allpaths = {allpaths}')
+
+
+
+# %%
+npad_dict
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ------------old stuff-----------------------
+
 # %% part 1
 
 def move_npad(todo, npad_paths, visited):
