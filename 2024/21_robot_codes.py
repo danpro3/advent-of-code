@@ -3,11 +3,9 @@ from heapq import heapify, heappop, heappush
 from collections import defaultdict
 
 from functools import lru_cache
-lines = open('inputs/input_21_test.txt','r').read().splitlines()
-# filestr = open('inputs/input_21.txt','r').read().splitlines()
-print(lines)
-code = lines[0]
-print(code)
+# codes = open('inputs/input_21_test.txt','r').read().splitlines()
+codes = open('inputs/input_21.txt','r').read().splitlines()
+print(codes)
 npad = {'7':(0,0), '8':(0,1), '9':(0,2), \
                '4':(1,0), '5':(1,1), '6':(1,2), \
                '1':(2,0), '2':(2,1), '3':(2,2), \
@@ -17,9 +15,8 @@ dpad = {'^':(0,1), 'A':(0,2), \
 
 dirs = {(-1,0):'^', (0,1):'>', (1,0):'v', (0,-1):'<'}
 
-# %%
+# %% ---------------  build dictionary of npad -------------------
 
-# @lru_cache
 def move_npad(todo, pair):
     steps, (r, c), path = heappop(todo)
     if (r,c) == npad[pair[1]]:
@@ -41,6 +38,12 @@ def move_npad(todo, pair):
             heappush(todo, (steps + 1, (r+dr,c+dc), path+dirs[(dr,dc)]))
     return todo
 
+def add_to_npad_dict(pair):
+    todo = [(0, npad[pair[0]], '')]
+    while todo:
+        todo = move_npad(todo, pair)
+    return
+
 code = 'A029A'
 visited = set()
 npad_paths = set()
@@ -48,16 +51,13 @@ npad_dict = dict()
 steps = 0
 for i in range(len(code)-1):
     pair = code[i:i+2]
-    todo = [(steps, npad[code[i]], '')]
-    while todo:
-        # print(todo)
-        todo = move_npad(todo, pair)
+    add_to_npad_dict(pair)
 
 # print(npad_paths)
 print(npad_dict)
 
-# %% build all paths of npad
-def concat(i, code, string, allpaths):
+# %% ---------- test build all paths of npad --------------------
+def concat_npad(i, code, string, allpaths):
     pair = code[i:i+2]
     if i == len(code)-2:
         if len(npad_dict[pair]) >= 1:
@@ -67,270 +67,125 @@ def concat(i, code, string, allpaths):
     else:
         if len(npad_dict[pair]) >= 1:
             for k in range(len(npad_dict[pair])):
-                concat(i+1,code, string + npad_dict[pair][k],allpaths)
+                concat_npad(i+1,code, string + npad_dict[pair][k],allpaths)
     return allpaths
 
 code = 'A029A'
 print(f'code = {code}')
-allpaths = concat(0, code, '', [])
-print(f'allpaths = {allpaths}')
+allpaths = concat_npad(0, code, '', [])
+print(f'num allpaths = {len(allpaths)}')
+print(f'length of each allpaths = {len(next(iter(allpaths)))}')
+# print(f'allpaths = {allpaths}')
 
 
+# %% --------   build dictionary of dpad  ------------------
 
-# %%
-npad_dict
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ------------old stuff-----------------------
-
-# %% part 1
-
-def move_npad(todo, npad_paths, visited):
-    steps, (r, c), code, path = heappop(todo)
-    if (r,c,path) in visited:
-        return todo
-    else:
-        visited.add((r, c, path))
-    # print(code)
-    if (r,c) == npad[code[0]]:
+def move_dpad(todo, pair):
+    steps, (r, c), path = heappop(todo)
+    if (r,c) == dpad[pair[1]]:
         path += 'A'
-        # print(f'found: code[0], rest: {code}, {path}')
-        if len(code) > 1:
-            code = code[1:]
-            if len(npad_paths) > 0 and len(path) > len(next(iter(npad_paths))):
-                return []
+        if pair not in dpad_dict:
+            print(f'Adding: {pair}, {path}')
+            dpad_dict[pair] = [path]
         else:
-            if len(npad_paths) > 0 and len(path) > len(next(iter(npad_paths))):
+            if len(path) > len(next(iter(dpad_dict[pair]))):
                 return []
             else:
-                npad_paths.add(path)
+                if path not in dpad_dict[pair]:
+                    print(f'Adding: {pair}, {path}')
+                    dpad_dict[pair].append(path)
                 return todo
     for dir in dirs:
         dr, dc = dir
-        if (r+dr,c+dc) in npad.values() and (r+dr,c+dc,path) not in visited:
+        if (r+dr,c+dc) in dpad.values():
             # print(f'pushing: {steps + 1, (r+dr,c+dc), (R,C), path+dirs[(dr,dc)]}')
-            heappush(todo, (steps + 1, (r+dr,c+dc), code, path+dirs[(dr,dc)]))
+            heappush(todo, (steps + 1, (r+dr,c+dc), path+dirs[(dr,dc)]))
     return todo
 
-def paths_for_npad(code):
-    visited = set()
-    npad_paths = set()
-    todo = []
-    heappush(todo,(0, npad['A'], code, ''))
+def add_to_dpad_dict(pair):
+    todo = [(0, dpad[pair[0]], '')]
     while todo:
-        # print(todo)
-        todo = move_npad(todo, npad_paths, visited)
-    return npad_paths
+        todo = move_dpad(todo, pair)
+    return
 
-code = '029A'
-npad_paths =  paths_for_npad(code)
-print(npad_paths)
-
-# %%
-# create quick dictionary for quickest ways to move on the dpad
-
-
-
-
-# %% move on the dpad given some sequences
-
-def move_dpad(todo, dpad_paths, visited):
-    steps, (r, c), seq, path, As = heappop(todo)
-    if len(dpad_paths) > 0 and steps > len(next(iter(dpad_paths))):
-        return todo
-    if path in visited:
-        return todo
-    else:
-        visited.add(path)
-    # print(seq)
-    if (r,c) == dpad[seq[0]]:
-        just_hit = seq[0]
-        path += 'A'
-        As += 1
-        # print(f'found: seq[0], rest: {seq}, {path}')
-        if len(seq) > 1:
-            seq = seq[1:]
-            while seq[0] == just_hit and len(seq) > 0:
-                path += 'A'
-                As += 1
-                seq = seq[1:]
-            if len(dpad_paths) > 0 and len(path) > len(next(iter(dpad_paths))):
-                return []
-        else:
-            if len(dpad_paths) > 0 and len(path) > len(next(iter(dpad_paths))):
-                return []
-            else:
-                dpad_paths.add(path)
-                return todo  # return [] for just 1 path
-    for dir in dirs:
-        dr, dc = dir
-        if (r+dr,c+dc) in dpad.values() and (r+dr,c+dc,path) not in visited:
-            # print(f'pushing: {steps + 1, (r+dr,c+dc), (R,C), path+dirs[(dr,dc)]}')
-            heappush(todo, (steps + 1, (r+dr,c+dc), seq, path+dirs[(dr,dc)], As))
-    return todo
-
-
-@lru_cache
-def paths_for_dpad(seq):
-    print(seq)
-    dpad_paths = set()
-    # while len(sequences) > 0:
-    # seq = sequences.pop()
-    todo = [(0, seq[0], seq, '', 0)]
-    print('working')
-    while todo:
-        # print(todo)
-        todo = move_dpad(todo, dpad_paths, visited)
-    # it = iter(dpad_paths)
-    # print(f'length of shortest path: {len(next(it))}')
-    # print(f'length of dpad_paths: {len(dpad_paths)}')
-    return dpad_paths
-
-# main ---------------
+path = 'A<A^A>^^AvvvA<A^A^>^AvvvA<A^A^^>AvvvA>><^'
 visited = set()
 dpad_paths = set()
-sequences = ['<A^A^^>AvvvA', '<A^A^>^AvvvA', '<A^A>^^AvvvA']
-for sequence in sequences:
-    dpad_paths |= paths_for_dpad(sequence)
-print(dpad_paths)
-# [print(x) for x in dpad_paths]
-print(f'length of dpad_paths: {len(dpad_paths)}')
-it = iter(dpad_paths)
-print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
-# example: v<<A>>^A<A>AvA<^AA>A<vAAA>^A
+dpad_dict = dict()
+steps = 0
+for i in range(len(path)-1):
+    pair = path[i:i+2]
+    add_to_dpad_dict(pair)
 
+# print(dpad_paths)
+print(dpad_dict)
 
-#--------gives 28 length-----------------
-# all_paths = set()
-# START = 'A'
-# codes = {'<A^A^^>AvvvA', '<A^A^>^AvvvA', '<A^A>^^AvvvA'}
-# while len(codes) > 0:
-#     code = codes.pop()
-#     visited = set()
-#     todo = [(0, dpad[START], code, '', 0)]
-#     while todo:
-#         # print(todo)
-#         todo = move_dpad(todo)
-# print(all_paths)
-# print(f'length of all_paths: {len(all_paths)}')
-# it = iter(all_paths)
-# print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
-
-
-
-
-# %%
-# how many presses are needed to hit the sequence
-# with a further depth of robots, if 
-# cache[sequence at depth] = min number
-
-# use the lr cache
-
-# recursion down. start at numpad
-
-import functools
-@functools.lru_cache
-def run_robot(level, sequence):
-    if level == 2: # end condition: number of robots
-        # print(f'seq = {sequence}')
-        return len(sequence)
-    if sequence in cache:
-        return cache[sequence]
+# %% ------------ test dpad paths -------------------------
+def concat_dpad(i, path, string, allpaths):
+    pair = path[i:i+2]
+    if i == len(path)-2:
+        if len(dpad_dict[pair]) >= 1:
+            for k in range(len(dpad_dict[pair])):
+                newstring = string + dpad_dict[pair][k]
+                # if len(allpaths) > 0 and len(newstring) == len(next(iter(allpaths))):
+                allpaths.add(newstring)
     else:
-        
-        sequences = paths_for_dpad(sequence)
-        print(f'sequences = {sequences}')
-        npresses_list = []
-        for sequence in sequences:
-            npresses = 0
-            for i in range(len(sequence)-1):
-                npresses += run_robot(level+1, sequence[i:i+2])
-            npresses_list.append(npresses)
-            print(f'npresses = {npresses}')
+        if len(dpad_dict[pair]) >= 1:
+            for k in range(len(dpad_dict[pair])):
+                concat_dpad(i+1,path, string + dpad_dict[pair][k],allpaths)
+    return allpaths
 
-        # cache[sequence] = min(npresses_list)
-        # cache[sequence] = min(run_robot(level+1, seq) for seq in sequences)
-    # return cache[sequence]
-        return min(npresses_list)
+paths = ['A<A^A>^^AvvvA', 'A<A^A^>^AvvvA', 'A<A^A^^>AvvvA']
+allpaths = set()
+allpaths_lengths = []
+for path in paths:
+    print(f'path = {path}')
+    allpaths = concat_dpad(0, path, '', allpaths)
+    print(f'num allpaths = {len(allpaths)}')
+    print(f'length of each allpaths = {len(next(iter(allpaths)))}')
+    for i in range(len(allpaths)):
+        allpaths_lengths.append(len(next(iter(allpaths))))
+#     print(allpaths_lengths)
+# print(f'allpaths = {allpaths}')
 
-cache = dict()
-code = '029A'
-npad_paths =  paths_for_npad(code)
-print(npad_paths)
+# %% -----------  recursion - main loop -------------
 
-npresses_list = []
-for i in range(len(next(inter(npad_paths))-1):
-    for npad_path in npad_paths:
-    npresses = 0
-        npresses += run_robot(0, npad_path[i:i+2])
-    npresses_list.append(npresses)
-    print(f'npresses = {npresses}')
+@lru_cache
+def tell_robot(layer, path):
+    path = 'A'+path
+    if layer == NUM_ROBOTS:
+        return len(path)-1
+    total_presses = 0
+    for i in range(len(path)-1):
+        if path[i:i+2] not in dpad_dict:
+            add_to_dpad_dict(path[i:i+2])
+        newpaths = dpad_dict[path[i:i+2]]
+        presses = []
+        for newpath in newpaths:
+            # print(f'dpad path: {newpath}, paths: {newpaths}')
+            presses.append(tell_robot(layer+1, newpath))
+        # print(f'all presses: {presses}')
+        total_presses += min(presses)
+    return total_presses
 
-print(f'min npresses = {min(npresses_list)}')
+# main
+NUM_ROBOTS = 26  # 3 for example, 26 for real input
+complexity = 0
+for code in codes:
+    code = 'A' + code
+    total_presses = 0
+    # print(f'code: {code}')
+    for i in range(len(code)-1):
+        if code[i:i+2] not in npad_dict:
+            add_to_npad_dict(code[i:i+2])
+        paths = npad_dict[code[i:i+2]]
+        # print(f'       npad pair: {code[i:i+2]}, paths: {paths}')
+        presses = []
+        for path in paths:
+            presses.append(tell_robot(1, path))
+            # print(f'       path = {path}, presses = {presses}')
+        total_presses += min(presses)
+    complexity += total_presses*int(code[1:-1])
+    print(f'code: {code}, presses: {total_presses}')
 
-print(f'npresses = {npresses}')
-print(f'dpad_paths = {dpad_paths}')
-print(f'length of dpad_paths: {len(dpad_paths)}')
-it = iter(dpad_paths)
-print(f'length of shortest path: {len(next(it))}, {len(next(it))}')
-
-complexity = npresses * int(code[:-1])
 print(f'complexity = {complexity}')
-
-# example 029A: length paths = 12, 28, 68
-
-# %%
-print(dpad_paths)
-ex = 'v<<A>>^A<A>AvA<^AA>A<vAAA>^A'
-ex in dpad_paths
-print(cache['<A^A^^>AvvvA'])
-
-
-
-# def move_dpad(todo, dpad_paths, visited):
-#     steps, (r, c), seq, path, As = heappop(todo)
-#     if len(dpad_paths) > 0 and steps > len(next(iter(dpad_paths))):
-#         return todo
-#     if path in visited:
-#         return todo
-#     else:
-#         visited.add(path)
-#     # print(seq)
-#     if (r,c) == dpad[seq[0]]:
-#         just_hit = seq[0]
-#         path += 'A'
-#         As += 1
-#         # print(f'found: seq[0], rest: {seq}, {path}')
-#         if len(seq) > 1:
-#             seq = seq[1:]
-#             while seq[0] == just_hit and len(seq) > 0:
-#                 path += 'A'
-#                 As += 1
-#                 seq = seq[1:]
-#             if len(dpad_paths) > 0 and len(path) > len(next(iter(dpad_paths))):
-#                 return []
-#         else:
-#             if len(dpad_paths) > 0 and len(path) > len(next(iter(dpad_paths))):
-#                 return []
-#             else:
-#                 dpad_paths.add(path)
-#                 return todo  # return [] for just 1 path
-#     for dir in dirs:
-#         dr, dc = dir
-#         if (r+dr,c+dc) in dpad.values() and (r+dr,c+dc,path) not in visited:
-#             # print(f'pushing: {steps + 1, (r+dr,c+dc), (R,C), path+dirs[(dr,dc)]}')
-#             heappush(todo, (steps + 1, (r+dr,c+dc), seq, path+dirs[(dr,dc)], As))
-#     return todo
