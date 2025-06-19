@@ -27,7 +27,7 @@ class Solution(object):
 
     def roll(self,board):
         score, curr = heappop(self.todo)
-        # print('score = ', score, 'curr = ', curr)
+        # print('popped score = ', score, 'curr = ', curr)
         if curr in self.visited:
             return score, self.todo
         else:
@@ -39,14 +39,21 @@ class Solution(object):
             if curr + die > self.n**2:
                 return
             elif curr + die == self.n**2:
-                print('Done. score = ',score+1)
+                print('Die roll to end. score = ',score+1)
                 self.todo = []
                 return score+1, self.todo
             else:
                 next = curr + die
                 if self.get_value(board,next) != -1:
                     next = self.get_value(board,next)
-                heappush(self.todo, (score+1, next))
+                    # print('next = ',next)
+                    if next == self.n**2:
+                        print('Ladder to end. score = ',score)
+                        self.todo = []
+                        return score+1, self.todo
+                    else:
+                        heappush(self.todo, (score+1, next))
+                        # print(self.todo)
         return score, self.todo
 
     def get_value(self,board,num):
@@ -60,10 +67,10 @@ class Solution(object):
         return value
 
 # main
-# board = [[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,35,-1,-1,13,-1],[-1,-1,-1,-1,-1,-1],[-1,15,-1,-1,-1,-1]] # 4
+board = [[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,35,-1,-1,13,-1],[-1,-1,-1,-1,-1,-1],[-1,15,-1,-1,-1,-1]] # 4
 # board = [[-1,-1],[-1,3]] # 1
 
-board = [[-1,-1,-1],[-1,9,8],[-1,8,9]] # 1
+# board = [[-1,-1,-1],[-1,9,8],[-1,8,9]] # 1
 _=[print(x) for x in board]
 solution = Solution()
 solution.snakesAndLadders(board)
