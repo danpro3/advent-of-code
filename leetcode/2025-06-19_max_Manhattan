@@ -1,0 +1,33 @@
+# %%
+class Solution(object):
+    def maxDistance(self, s, k):
+        """
+        :type s: str
+        :type k: int
+        :rtype: int
+        """
+        # start here
+        D = {'N':('y',1),'S':('y',-1),'E':('x',1),'W':('x',-1)}
+        self.n = len(s)
+        self.x = []
+        self.y = []
+        for step in range(self.n):
+            dir,v = D[s[step]]
+            if dir == 'x', self.x
+            print(dir,v)
+
+
+
+
+
+
+
+
+
+        # def find_dist():
+
+s = "NWSE"; k = 1
+# s = "NSWWEW"; k = 3
+print(s,k)
+solution = Solution()
+solution.maxDistance(s,k)
