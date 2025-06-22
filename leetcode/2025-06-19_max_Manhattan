@@ -7,27 +7,115 @@ class Solution(object):
         :rtype: int
         """
         # start here
-        D = {'N':('y',1),'S':('y',-1),'E':('x',1),'W':('x',-1)}
+        self.s = s
         self.n = len(s)
-        self.x = []
-        self.y = []
-        for step in range(self.n):
-            dir,v = D[s[step]]
-            if dir == 'x', self.x
-            print(dir,v)
+        self.MOVE = {'N':1,'S':-1,'E':1,'W':-1}
+        self.OPP = {'N':'S','S':'N','E':'W','W':'E'}
+
+        self.todo = [('',k,0,0,0)] # staring letter
+        self.curr_max = 0 #self.get_manh(s)
+        while self.todo:
+            # print('todo:',self.todo)
+            self = self.check_todo()
+        return self.curr_max
 
 
+    def check_todo(self):
+        str,k,x,y,max_D = self.todo.pop(-1)
+        idx = len(str)
+        # print('popped str:',str,', k:',k)
+        if idx == self.n:  # end of string
+            if max_D > self.curr_max:
+                self.curr_max = max_D
+            return self
+        elif max_D + self.n - idx <= self.curr_max:
+            return self
+        if k > 0:
+            # swap the 'should be' letter and add it to the todo
+            str2 = str + self.OPP[self.s[idx]]
+            move = self.MOVE[self.OPP[self.s[idx]]]
+            new_max_D = max_D
+            if self.OPP[self.s[idx]] in 'EW':
+                if abs(x+move) + abs(y) > new_max_D:
+                    new_max_D += 1
+                self.todo.append((str2, k-1, x+move, y, new_max_D))
+                # print(('append: ',str2, k-1, x+move, y, new_max_D))
+            else:
+                if abs(x) + abs(y+move) > new_max_D:
+                    new_max_D += 1
+                self.todo.append((str2, k-1, x, y+move, new_max_D))
+                # print(('append: ',str2, k-1, x, y+move, new_max_D))
+
+            # add the next
+            str2 = str + self.s[idx]
+            move = self.MOVE[self.s[idx]]
+            new_max_D = max_D
+            if self.s[idx] in 'EW':
+                if abs(x+move) + abs(y) > new_max_D:
+                    new_max_D += 1
+                self.todo.append((str2, k, x+move, y, new_max_D))
+                # print(('append: ',str2, k, x+move, y, new_max_D))
+            else:
+                if abs(x) + abs(y+move) > new_max_D:
+                    new_max_D += 1
+                self.todo.append((str2, k, x, y+move, new_max_D))
+                # print(('append: ',str2, k, x, y+move, new_max_D))
+        else:
+            # Add the rest
+            new_max_D = max_D
+            for idx in range(idx,self.n):
+                str = str + self.s[idx]
+                move = self.MOVE[self.s[idx]]
+                if self.s[idx] in 'EW':
+                    if abs(x+move) + abs(y) > new_max_D:
+                        new_max_D += 1
+                    x += move
+                else:
+                    if abs(x) + abs(y+move) > new_max_D:
+                        new_max_D += 1
+                    y += move
+                if new_max_D + self.n - idx <= self.curr_max:
+                    return self
+                # print('idx:',idx,'str:',str,'move',move,'x',x,'new_max_D',new_max_D)
+            self.todo.append((str, k, x, y+move, new_max_D))
+            # print(('append: ',str, k, x, y+move, new_max_D))
+        return self
 
 
+s = "NWSE"; k = 1 # 3
+s = "NSWWEW"; k = 3 # 6
+# s = "EWWE"; k = 0 # 1
+# s = "NSES"; k = 1 # 4
+# s = "NWNS"; k = 0 # 3
+# s = "WEWE"; k = 1 # 3
+# s = "EWWE"; k = 1 # 3
 
-
-
-
-
-        # def find_dist():
-
-s = "NWSE"; k = 1
-# s = "NSWWEW"; k = 3
-print(s,k)
+print('s = ',s,'k = ',k)
 solution = Solution()
 solution.maxDistance(s,k)
+
+# %%
+  # def get_manh(self,str):
+    #     manh = []; 
+    #     manh = 0; max_manh = 0; x = 0; y = 0
+    #     for step in range(self.n):
+    #         if step == len(str):
+    #             # short string
+    #             # manh.append(manh[-1] + self.n - len(str))
+    #             max_manh = abs(x) + abs(y) + self.n - len(str)
+    #             # print('    manh = ',manh,'max: ',max(manh))
+    #             # return max(manh)
+    #             return max_manh
+    #         else:
+    #             move = self.MOVE[str[step]]
+    #             if self.COOR[str[step]] == 'x':
+    #                 x += move
+    #             else:
+    #                 y += move
+    #             # manh.append(abs(x)+abs(y))
+    #             manh = abs(x) + abs(y)
+    #             if manh >  max_manh:
+    #                 max_manh = manh
+    #     print('    str = ',str,'manh = ',manh,'max: ',max_manh)
+    #     # return max(manh)
+    #     return max_manh
