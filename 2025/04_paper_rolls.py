@@ -8,29 +8,41 @@ def find_neighbors(grid,r,c):
     return n
 
 # main
-# grid = open('inputs/input_04_test.txt','r').read().splitlines()
-grid = open('inputs/input_04.txt','r').read().splitlines()
-# print(grid)
+# lines = open('inputs/input_04_test.txt','r').read().splitlines()
+lines = open('inputs/input_04.txt','r').read().splitlines()
+
+# pad the lines with .
+padstr = '.'*len(lines[0])
+lines.insert(0,padstr)
+lines.append(padstr)
+for i in range(len(lines)):
+    lines[i] = '.'+lines[i]+'.'
 # _ = [print(x) for x in grid]
 
-# pad the grid
-padstr = '.'*len(grid[0])
-grid.insert(0,padstr)
-grid.append(padstr)
-for i in range(len(grid)):
-    grid[i] = '.'+grid[i]+'.'
-# _ = [print(x) for x in grid]
+# breakout into grid
+grid = [list(line) for line in lines]
+# print(grid)
+# _ = [print(''.join(x)) for x in grid]
+# print()
 
 # search for accessable paper rolls
 dirs = (-1,-1,),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)
 rows = len(grid)
 cols = len(grid[0])
-rolls = 0
-for r in range(1,rows-1):
-    for c in range(1,cols-1):
-        if grid[r][c] == '@':
-            if find_neighbors(grid,r,c) < 4:
-                rolls += 1
+rollslist = []
+done = False
+while not done:
+    rolls = 0
+    for r in range(1,rows-1):
+        for c in range(1,cols-1):
+            if grid[r][c] == '@':
+                if find_neighbors(grid,r,c) < 4:
+                    rolls += 1
+                    grid[r][c] = '.'
+    rollslist.append(rolls)
+    # print(f'rolls = {rolls}, rollslist = {rollslist}')
+    if rolls == 0:
+        done = True
 
-# _ = [print(x) for x in grid]
-print(f'accessible rolls = {rolls}')
+# _ = [print(''.join(x)) for x in grid]
+print(f'total cleared rolls = {sum(rollslist)}')
