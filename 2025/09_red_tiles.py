@@ -18,15 +18,14 @@ for a in range(n-1):
 
 print(f'max area = {max_area}')
 
-
-
-# %% part 1
+# %% part 2
 lines = open('inputs/input_09_test.txt','r').read().splitlines()
 # lines = open('inputs/input_09.txt','r').read().splitlines()
 '''
 make a list of red tile coordinates
-make a list of green tile coordinates
 make a list of rectangles, sort by area
+make a list of green tile coordinates
+fill in the pattern
 work thru the largest rectanges and test for all tiles
 inside being red or green
 '''
@@ -38,13 +37,12 @@ for i,line in enumerate(lines):
 print(reds)
 
 # find areas, sort reverse
-max_area = 0
 areas = []
 for a in range(n-1):
     for b in range(1,n):
-        areas.append((abs(reds[a][0] - reds[b][0])+1)*\
-        abs((reds[a][1] - reds[b][1])+1)),\
-        (reds[a][0],reds[a][1]),(reds[b][0],reds[b][1])
+        areas.append((\
+            abs(reds[a][0] - reds[b][0]+1)*abs(reds[a][1] - reds[b][1]+1),\
+            (reds[a][0],reds[a][1]),(reds[b][0],reds[b][1]) ))
 areas.sort(reverse=True)
 print(areas)
 
@@ -86,14 +84,13 @@ for red in reds:
     grid[red[1]][red[0]] = '#'
 _ = [print(''.join(x)) for x in grid]
 print()
-
 for green in greens:
     # print(green[0],green[1])
     grid[green[1]][green[0]] = '#'
 _ = [print(''.join(x)) for x in grid]
+print()
 
-
-# %% Find all middles
+# fill in the grid
 chars = ['.','#']
 for r in range(len(grid)):
     # print(grid[r])
@@ -110,17 +107,12 @@ for r in range(len(grid)):
         elif grid[r][c] == '.' and n == 1:
             grid[r][c] = chars[n]
             greens.add((c,r))
-            
 _ = [print(''.join(x)) for x in grid]
-
-# make dictionary of rectangles
-# tuples: (area, (coord_A), (coord_B))
-# for 
-
-# print(reds)
-
+print()
 
 # now loop thru rectangles and check for greens
 
 
 
+
+# %%
