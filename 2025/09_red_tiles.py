@@ -18,6 +18,8 @@ for a in range(n-1):
 
 print(f'max area = {max_area}')
 
+
+
 # %% part 1
 lines = open('inputs/input_09_test.txt','r').read().splitlines()
 # lines = open('inputs/input_09.txt','r').read().splitlines()
@@ -70,21 +72,55 @@ else:
     while x <= max(reds[0][0],reds[n-1][0]):
         greens.add((x,reds[n-1][1]))
         x += 1
-print(greens)
+# print(greens)
 
 # make a grid
 x_values = [t[0] for t in reds]
 y_values = [t[1] for t in reds]
 xrange = (min(x_values),max(x_values))
 yrange = (min(y_values),max(y_values))
-print(xrange,yrange)
+# print(xrange,yrange)
 grid =[['.' for _ in range(xrange[1]+2)] for _ in range(yrange[1]+2)]
 for red in reds:
-    print(red[0],red[1])
+    # print(red[0],red[1])
     grid[red[1]][red[0]] = '#'
 _ = [print(''.join(x)) for x in grid]
+print()
 
 for green in greens:
-    print(green[0],green[1])
+    # print(green[0],green[1])
     grid[green[1]][green[0]] = '#'
 _ = [print(''.join(x)) for x in grid]
+
+
+# %% Find all middles
+chars = ['.','#']
+for r in range(len(grid)):
+    # print(grid[r])
+    n = 0
+    for c in range(len(grid[r])):
+        # print(r,c,grid[r][c],n)
+        if grid[r][c] == '#' and grid[r][c+1:] == ['.']*len(grid[r][c+1:]):
+            n = 0
+            continue
+        if grid[r][c] == '#' and grid[r][c+1] == '.' and n == 0:
+            n = 1
+        elif grid[r][c] == '#' and grid[r][c+1] == '.' and n == 1:
+            n = 0
+        elif grid[r][c] == '.' and n == 1:
+            grid[r][c] = chars[n]
+            greens.add((c,r))
+            
+_ = [print(''.join(x)) for x in grid]
+
+# make dictionary of rectangles
+# tuples: (area, (coord_A), (coord_B))
+# for 
+
+# print(reds)
+
+
+# now loop thru rectangles and check for greens
+
+
+
