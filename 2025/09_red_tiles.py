@@ -19,8 +19,8 @@ for a in range(n-1):
 print(f'max area = {max_area}')
 
 # %% part 2
-lines = open('inputs/input_09_test.txt','r').read().splitlines()
-# lines = open('inputs/input_09.txt','r').read().splitlines()
+# lines = open('inputs/input_09_test.txt','r').read().splitlines()
+lines = open('inputs/input_09.txt','r').read().splitlines()
 '''
 make a list of red tile coordinates
 make a list of rectangles, sort by area
@@ -34,7 +34,13 @@ n = len(lines)
 reds = [(0,0)]*n
 for i,line in enumerate(lines):
     reds[i] = tuple([int(x) for x in line.split(',')])
-print(reds)
+print(reds[:20])
+x_values = [t[0] for t in reds]
+y_values = [t[1] for t in reds]
+x_min = min(x_values)
+y_min = min(y_values)
+reds = [(x-x_min,y-y_min) for x,y in reds]
+print(reds[:20])
 
 # find areas, sort reverse
 areas = []
@@ -44,9 +50,9 @@ for a in range(n-1):
             abs(reds[a][0] - reds[b][0]+1)*abs(reds[a][1] - reds[b][1]+1),\
             (reds[a][0],reds[a][1]),(reds[b][0],reds[b][1]) ))
 areas.sort(reverse=True)
-print(areas)
+print(areas[:20])
 
-# list of greens (greens + reds)
+# list of greens (greens + reds) make the border
 greens = set([])
 for i in range(n-1):
     if reds[i+1][0] == reds[i][0]:
@@ -70,20 +76,28 @@ else:
     while x <= max(reds[0][0],reds[n-1][0]):
         greens.add((x,reds[n-1][1]))
         x += 1
-# print(greens)
+print(f'length of greens = {len(greens)}')
 
 # make a grid
 x_values = [t[0] for t in reds]
 y_values = [t[1] for t in reds]
-xrange = (min(x_values),max(x_values))
-yrange = (min(y_values),max(y_values))
+# xrange = (min(x_values),max(x_values))
+# yrange = (min(y_values),max(y_values))
+xrange = max(x_values)+1
+yrange = max(y_values)+1
 # print(xrange,yrange)
-grid =[['.' for _ in range(xrange[1]+2)] for _ in range(yrange[1]+2)]
+print('hello')
+# grid =[['.' for _ in range(xrange[1]+2)] for _ in range(yrange[1]+2)]
+grid = [['.']*(xrange+2)]
+for _ in range(yrange+2):
+    grid.append(['.']*(xrange+2))
+# print(grid)
+
 for red in reds:
     # print(red[0],red[1])
     grid[red[1]][red[0]] = '#'
-_ = [print(''.join(x)) for x in grid]
-print()
+# _ = [print(''.join(x)) for x in grid]
+# print()
 for green in greens:
     # print(green[0],green[1])
     grid[green[1]][green[0]] = '#'
@@ -107,12 +121,34 @@ for r in range(len(grid)):
         elif grid[r][c] == '.' and n == 1:
             grid[r][c] = chars[n]
             greens.add((c,r))
-_ = [print(''.join(x)) for x in grid]
-print()
-
+# _ = [print(''.join(x)) for x in grid]
+# print()
+# print(areas)
 # now loop thru rectangles and check for greens
+found = False
+rect = 0 # first rectangle with highest area
+while not found:
+    area, A, B = areas.pop(0)
+    print(area,A,B)
+    # build the list of points in the rectangle
+    interior_points = []
+    for x in range(min(A[0],B[0]), max(A[0],B[0])+1):
+        for y in range(min(A[1],B[1]), max(A[1],B[1])+1):
+            interior_points.append((x, y))
+    # print(interior_points)
+    
+    # are all the points green?
+    all_reds = True
+    i = 0
+    while all_reds and i < area:
+        if interior_points[i] not in greens:
+            all_reds = False
+        i += 1
+    # print(i)
+    if all_reds == True:
+        found = True
+    
+print(f'maximum area with all green/red tiles = {area}')
+    
 
 
-
-
-# %%
