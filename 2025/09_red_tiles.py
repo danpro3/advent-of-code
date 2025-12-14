@@ -19,8 +19,8 @@ for a in range(n-1):
 print(f'max area = {max_area}')
 
 # %% part 2
-# lines = open('inputs/input_09_test.txt','r').read().splitlines()
-lines = open('inputs/input_09.txt','r').read().splitlines()
+lines = open('inputs/input_09_test.txt','r').read().splitlines()
+# lines = open('inputs/input_09.txt','r').read().splitlines()
 '''
 make a list of red tile coordinates
 make a list of rectangles, sort by area
@@ -34,12 +34,12 @@ n = len(lines)
 reds = [(0,0)]*n
 for i,line in enumerate(lines):
     reds[i] = tuple([int(x) for x in line.split(',')])
-print(reds[:20])
+print(f'reds: {reds[:20]}')
 x_values = [t[0] for t in reds]
 y_values = [t[1] for t in reds]
 x_min = min(x_values)
 y_min = min(y_values)
-reds = [(x-x_min,y-y_min) for x,y in reds]
+reds = [(x-x_min+1,y-y_min+1) for x,y in reds]
 print(reds[:20])
 
 # find areas, sort reverse
@@ -50,7 +50,7 @@ for a in range(n-1):
             abs(reds[a][0] - reds[b][0]+1)*abs(reds[a][1] - reds[b][1]+1),\
             (reds[a][0],reds[a][1]),(reds[b][0],reds[b][1]) ))
 areas.sort(reverse=True)
-print(areas[:20])
+print(f'areas: {areas[:20]}')
 
 # list of greens (greens + reds) make the border
 greens = set([])
@@ -78,6 +78,150 @@ else:
         x += 1
 print(f'length of greens = {len(greens)}')
 
+# range: 
+x_values = [t[0] for t in reds]
+y_values = [t[1] for t in reds]
+xrange = (min(x_values)-1,max(x_values)+1)
+yrange = (min(y_values)-1,max(y_values)+1)
+print(f'x range: {xrange}, y range: {yrange}')
+
+
+# now loop thru rectangles and check for edges
+print('Looping thru rectangles')
+found = False
+while not found:
+    area, A, B = areas.pop(0)
+    print(area,A,B)
+    # loop on the points in the rectangle
+    x_min = min(A[0],B[0])
+    x_max = max(A[0],B[0])
+    y_min = min(A[1],B[1])
+    y_max = max(A[1],B[1])
+    this_rect = True
+    
+    wallpts = [(x_min,y) for y in range(y_min,y_max+1)] # wall 1
+    print(f'wallpts 1: {wallpts[0:20]}')
+    for x,y in wallpts:
+        while this_rect and x > xrange[0]:
+            if (x,y) in greens:
+                x = xrange[0]-1 # set it outside the range
+            x -= 1
+        if x == xrange[0]:
+            this_rect = False
+    if this_rect == False:
+        continue
+
+    wall = [(x_max,y) for y in range(y_min,y_max+1)] # wall 2
+    print(f'wallpts 2: {wallpts[0:20]}')
+    for x,y in wallpts:
+        while this_rect and x < xrange[1]:
+            if (x,y) in greens:
+                x = xrange[1]+1 # set it outside the range
+            x += 1
+        if x == xrange[1]:
+            this_rect = False
+    if this_rect == False:
+        continue
+
+    wall = [(x,y_min) for y in range(x_min,x_max+1)] # wall 3
+    print(f'wallpts 3: {wallpts[0:20]}')
+    for x,y in wallpts:
+        while this_rect and y > yrange[0]:
+            if (x,y) in greens:
+                y = yrange[0]-1 # set it outside the range
+            y -= 1
+        if y == yrange[0]:
+            this_rect = False
+    if this_rect == False:
+        continue
+
+    wall = [(x,y_max) for y in range(x_min,x_max+1)] # wall 4
+    print(f'wallpts 4: {wallpts[0:20]}')
+    for x,y in wallpts:
+        while this_rect and y < yrange[1]:
+            if (x,y) in greens:
+                 y = yrange[1]+1 # set it outside the range
+            y += 1
+        if y == yrange[1]:
+            this_rect = False
+
+    if this_rect: # still true after all wall checks
+        found = True
+    
+
+# finish 
+print(f'maximum area with all green/red tiles = {area} coords: {A, B}')
+    
+# %% NOT USED
+
+# get the coordinates of all tiles outside the loop
+dirs = [(1,0),(0,1),(-1,0),(0,-1)]
+def move(todo):
+    r,c = todo.pop(0)
+    # if (r,c) in visited:
+    #     return
+    # else:
+    # visited.add((r,c))
+    for dir in dirs:
+        if r+dir[0] >= xrange[0] and r+dir[0] <= xrange[1]\
+        and c+dir[1] >= yrange[0] and c+dir[1] <= yrange[1]\
+        and (r+dir[0],c+dir[1]) not in greens\
+        and (r,c) not in visited:
+            todo.append((r+dir[0],c+dir[1]))
+    visited.add((r,c))
+
+visited = set()
+todo = [(xrange[0],yrange[0])]
+while len(todo) > 0:
+    # print(todo)
+    move(todo)
+print(f'length of visited = {len(visited)}')
+
+# now loop thru rectangles and check for greens
+print('Looping thru rectangles')
+found = False
+while not found:
+    area, A, B = areas.pop(0)
+    # print(area,A,B)
+    # loop on the points in the rectangle
+    x = min(A[0],B[0])
+    x_max = max(A[0],B[0])
+    this_rect = True
+    while this_rect and x <= x_max:
+        y = min(A[1],B[1])
+        y_max = max(A[1],B[1])
+        while this_rect and y <= y_max:
+            if (x,y) in visited:
+                this_rect = False
+            y += 1
+        x += 1
+    if this_rect == True:
+        found = True
+# finish 
+print(f'maximum area with all green/red tiles = {area} coords: {A, B}')
+
+# %% NOT USED
+
+# make a grid
+grid = [['.']*(xrange[1]+1)]
+for _ in range(yrange[1]):
+    grid.append(['.']*(xrange[1]+1))
+for green in greens:
+    grid[green[1]][green[0]] = '#'
+for vis in visited:
+    grid[vis[1]][vis[0]] = 'x'
+print(f'Grid complete: {len(grid)} x {len(grid[0])}')
+_ = [print(''.join(x)) for x in grid]
+print()
+
+
+
+
+# %%
+
+# NOT USED
+
+
 # make a grid
 x_values = [t[0] for t in reds]
 y_values = [t[1] for t in reds]
@@ -88,21 +232,20 @@ yrange = max(y_values)+1
 # print(xrange,yrange)
 print('hello')
 # grid =[['.' for _ in range(xrange[1]+2)] for _ in range(yrange[1]+2)]
-grid = [['.']*(xrange+2)]
-for _ in range(yrange+2):
-    grid.append(['.']*(xrange+2))
-# print(grid)
+grid = [['.']*(xrange+1)]
+for _ in range(yrange):
+    grid.append(['.']*(xrange+1))
+print(f'Grid complete: {len(grid)} x {len(grid[0])}')
 
-for red in reds:
-    # print(red[0],red[1])
-    grid[red[1]][red[0]] = '#'
-# _ = [print(''.join(x)) for x in grid]
-# print()
 for green in greens:
     # print(green[0],green[1])
     grid[green[1]][green[0]] = '#'
 _ = [print(''.join(x)) for x in grid]
 print()
+
+
+
+
 
 # fill in the grid
 chars = ['.','#']
@@ -136,19 +279,22 @@ while not found:
         for y in range(min(A[1],B[1]), max(A[1],B[1])+1):
             interior_points.append((x, y))
     # print(interior_points)
-    
-    # are all the points green?
-    all_reds = True
-    i = 0
-    while all_reds and i < area:
-        if interior_points[i] not in greens:
-            all_reds = False
-        i += 1
-    # print(i)
-    if all_reds == True:
-        found = True
-    
-print(f'maximum area with all green/red tiles = {area}')
-    
 
 
+# now loop thru rectangles and check for greens
+this_rect = True
+while this_rect:
+    area, A, B = areas.pop(0)
+    print(area,A,B)
+    # loop on the points in the rectangle
+    x = min(A[0],B[0])
+    x_max = max(A[0],B[0])
+    while this_rect and x <= x_max:
+        y = min(A[1],B[1])
+        y_max = max(A[1],B[1])
+        while this_rect and y <= y_max:
+            if grid[x][y] == '.':
+                this_rect = False
+            y += 1
+        x += 1
+# %%
